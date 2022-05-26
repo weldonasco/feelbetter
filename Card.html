@@ -1,0 +1,250 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>FEEL BETTER <3</title>
+</head>
+
+    <style>
+        :root {
+            --light-purple: #decdf5;
+            --dark-purple: #b3b0bf;
+            --black: #182825;
+            --white: #fef4ec
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0%;
+            left: 0%;
+            height: 100%;
+            width: 100%;
+            z-index: -1;
+            background: repeating-linear-gradient(45deg, var(--light-purple), var(--light-purple) 1vw, var(--dark-purple) 1vw, var(--dark-purple) 2vw);
+            opacity: 0.5;
+        }
+
+        body {
+            text-align: center;
+            font-family: 'Prompt', sans-serif;
+            color: var(--black);
+            font-size: 16px;
+        }
+
+        h1 {
+            font-weight: 900;
+            font-size: 3em;
+        }
+
+        .soup {
+            position: absolute;
+            animation-name: soup;
+            animation-duration: 1s;
+            animation-fill-mode: forwards;
+        }
+
+        button {
+            font-family: inherit;
+            border: none;
+            border-radius: 5px;
+            padding: 10px;
+            background-color: var(--white);
+            margin: 10px;
+        }
+
+        button:hover {
+            background-color: var(--light-purple);
+            box-shadow: 0 0 0 5px var(--dark-purple);
+        }
+
+        #soup-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #soup-field {
+            height: 400px;
+            width: 80%;
+            position: relative;
+            background-color: var(--white);
+            margin: 10px;
+            border-radius: 5px;
+            animation-duration: 10s;
+            animation-iteration-count: infinite;
+        }
+
+        .cannon {
+            animation-name: cannon;
+            animation-duration: 1s;
+            animation-fill-mode:forwards;
+            animation-timing-function: ease-out;
+            z-index: 10;
+            position: fixed;
+        }
+
+        @keyframes cannon {
+            0% {
+                top: 100%;
+                left: 0%;
+            }
+
+            100% {
+                top: 20%;
+                left: 100%;
+            }
+        }
+
+        @keyframes soup {
+            0% {
+                opacity: 0;
+                transform: rotate(360deg) scale(0);
+            }
+
+            75% {
+                transform: rotate(0deg) scale(1.2);
+            }
+
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+    </style>
+
+    <link href="https://fonts.googleapis.com/css?family=Prompt" rel="stylesheet" type="text/css">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/16.8.3/umd/react.development.js" crossorigin=""></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/16.8.3/umd/react-dom.production.min.js" crossorigin=""></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+
+    <script type="text/babel">
+        const SOUP = 'https://creazilla-store.fra1.digitaloceanspaces.com/cliparts/59674/egg-soup-clipart-md.png';
+
+        class CannonSoup extends React.Component {
+            constructor(props){
+                super(props);
+            }
+
+            render(){
+                return (<img className='cannon' style={{width: '50px'}} src = {SOUP}></img>);
+            }
+        }
+
+        class Soup extends React.Component {
+            constructor(props){
+                super(props);
+            }
+
+            render(){
+                let style = {left: this.props.x + '%', top: this.props.y + '%', maxWidth: this.props.width + '%', maxHeight: this.props.width + '%'};
+
+                return(
+                    <img className='soup' style = {style} src = {SOUP}></img>
+                );
+            }
+        }
+
+        class SoupBox extends React.Component{
+            constructor(props){
+                super(props);
+
+                this.state = {positions: [], cannons: 0, firing: false, souping: false};
+                this.addSoup = this.addSoup.bind(this);
+                this.soupCannon = this.soupCannon.bind(this);
+                this.megaSoupCannon = this.megaSoupCannon.bind(this);
+                this.reset = this.reset.bind(this);
+                this.addCannon = this.addCannon.bind(this);
+            }
+            reset(){
+                this.setState({firing: false});
+            }
+            addSoup(){
+                this.setState({souping: true});
+
+                let size = Math.floor(Math.random() * 21 + 5);
+
+                let next = [Math.floor(Math.random() * (91 - size) + 5), Math.floor(Math.random() * (91 - size) + 5), size];
+
+                this.setState(state => ({
+                    positions: [...state.positions, next]
+                }));
+            }
+
+            addCannon(){
+                this.setState(state => ({cannons: state.cannons + 1}));
+            }
+
+            soupCannon(){
+                if(this.state.firing){
+                    return;
+                }
+
+                this.setState({cannons: 0});
+
+                this.setState({firing: true});
+
+                for(let i = 0; i < 5; i++){
+                    setTimeout(this.addCannon, 100 * i);
+                    setTimeout(this.addSoup, 1400 + 100 * i);
+                }
+                setTimeout(this.reset, 1400);
+            }
+
+            megaSoupCannon(){
+                if(this.state.firing){
+                    return;
+                }
+
+                this.setState({cannons: 0});
+
+                this.setState({firing: true});
+
+                for(let i = 0; i < 15; i++){
+                    setTimeout(this.addCannon, 100 * i);
+                    setTimeout(this.addSoup, 2400 + 100 * i);
+                }
+                setTimeout(this.reset, 2400);
+            }
+
+            render(){
+                let index = 0;
+                let cannon
+
+                return(
+
+                    <div id = 'soup-container'>
+
+                        <button onClick = {this.addSoup}>Soup!</button>
+                        {this.state.positions.length >= 10 && <button onClick = {this.soupCannon}>SOUP CANNON</button>}
+                        {this.state.positions.length >= 30 && <button onClick = {this.megaSoupCannon}>MEGA SOUP CANNON</button>}
+                        {this.state.positions.length >= 30 && <div>Congratulations! You have unlocked all prizes! I know it's not a lot, but I thought I would make a little something for you :)</div>}
+                        <div>Soups received: {this.state.positions.length} </div>
+
+                        <div id = 'soup-field'>
+                            {this.state.positions.map(elem => <Soup key = {index++} x = {elem[0]} y = {elem[1]} width = {elem[2]}/>)}
+                        </div>
+
+                        {this.state.firing && Array(this.state.cannons).fill(0).map(elem => <CannonSoup key = {index++}/>)}
+                    </div>
+                );
+            }
+        }
+
+        ReactDOM.render(<SoupBox/>, document.getElementById('root'));
+    </script>
+
+<body>
+    <h1>Feel Better :(</h1>
+
+    <p>You are sick and I want you to feel better so I made you a feel better card so you feel better</p>
+
+    <p>I am self-conscious about how this looks because you do graphics stuff but I hope you like it :,)</p>
+
+    <p>Reach various soup milestones to get special prizes!</p>
+
+    <div id="root"></div>
+</body>
+</html>
